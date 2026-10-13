@@ -1,0 +1,7 @@
+functions/
+supabase/
+local-tests/
+node_modules/
+*.log
+*.zip
+.env*

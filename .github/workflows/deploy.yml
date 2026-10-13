@@ -1,0 +1,33 @@
+name: Deploy invite-only frontend
+on: workflow_dispatch
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: invite-frontend
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: invite-web
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check public frontend assets
+        run: |
+          node --check site/assets/client.js
+          node --check site/assets/catalog.js
+          node --check site/assets/admin.js
+          test ! -d site/api
+          if grep -RIE 'sb_secret_|SUPABASE_SERVICE_ROLE_KEY|gp_w_[a-f0-9]{64}' site; then exit 1; fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+          retention-days: 1
+      - name: Deploy login interface
+        id: deployment
+        uses: actions/deploy-pages@v4
