@@ -63,4 +63,5 @@
     window.gpFetch('/api/auth/exchange',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:handoff})}).then(async response=>{const data=await response.json();if(!response.ok)throw Error(data.detail);$('#login-message').textContent='';window.gpShow(user.role==='admin'?'admin':'catalog');}).catch(error=>{$('#login-message').textContent=error.message||'入口已过期，请从本机重新打开。';});
   }
   if(!endpoint)$('#login-message').textContent='邀请站尚未完成部署，活动数据仍保持私有。';
+  if(endpoint)window.gpFetch('/api/health').then(async response=>{if(!response.ok)throw Error();const data=await response.json();document.querySelector('#connection-status').textContent=data.ok?'云端连接正常 · 请登录后查看活动':'云端暂时无法连接。';}).catch(()=>{document.querySelector('#connection-status').textContent='云端暂时无法连接，请稍后重试。';});
 })();
